@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--background: #212121;
+	--background-second: #171717;
+	--foreground: #ececec;
+}
+
+body {
+	color: var(--foreground);
+	background: var(--background);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.bg-sec {
+	background: var(--background-second);
+}
+
+.w-100 {
+	width: 25rem;
+}
