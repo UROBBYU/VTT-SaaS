@@ -25,6 +25,9 @@ export default ({
 }>) =>
 <ClerkProvider>
 	<html lang="en">
+		<head>
+			<title>UROBBYU's VTT SaaS App</title>
+		</head>
 		<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 			{children}
 		</body>
