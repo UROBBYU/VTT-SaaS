@@ -58,7 +58,7 @@ export const POST = async (req: ExtRequest) => {
 	req.rawBody = await req.text()
 
 	const isVerified = verifySignature(req)
-	if (!isVerified) return new Response(null, { status: 405 })
+	if (!isVerified) return new Response('Svix signature cannot be verified', { status: 412 })
 
 	const body = JSON.parse(req.rawBody) as ClerkWebhookBody
 
