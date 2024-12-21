@@ -77,6 +77,7 @@ export const POST = async (req: ExtRequest) => {
 				await prisma.user.update({ where, data: { email } })
 		}
 	} catch (error) {
+		console.error(error)
 		return new Response('Webhook Error.', { status: 500 })
 	}
 

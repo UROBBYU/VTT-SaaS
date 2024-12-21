@@ -13,7 +13,7 @@ model Upload {
 	text      String
 	size      Int
 	hash      String
-	author    User @relation(fields: [authorId], references: [clerkId])
+	author    User @relation(fields: [authorId], references: [clerkId], onDelete: Cascade)
 	authorId  String
 	createdAt DateTime @default(now())
 }
