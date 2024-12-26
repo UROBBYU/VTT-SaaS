@@ -4,8 +4,10 @@
 
 :root {
 	--background: #212121;
-	--background-second: #171717;
+	--background-dark: #171717;
+	--background-light: #2f2f2f;
 	--foreground: #ececec;
+	--border: #999;
 }
 
 body {
@@ -14,10 +16,45 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
-.bg-sec {
-	background: var(--background-second);
+code {
+	padding-inline: .3em;
+	line-height: 1.6em;
+	background: linear-gradient( 45deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 100% );
+	border: .5px solid #000;
+	border-radius: 6px;
+	margin-inline: 1px;
 }
 
 .w-100 {
 	width: 25rem;
+}
+
+.bg-dark {
+	background-color: var(--background-dark);
+}
+
+.bg-light {
+	background-color: var(--background-light);
+}
+
+.border-dark {
+	border-color: var(--background);
+}
+
+.border-light {
+	border-color: var(--background-light);
+}
+
+.form-column {
+	padding: 1.5rem max(1rem, 50% - 16rem);
+}
+
+.input-box {
+	background: var(--background-light);
+	margin-block: 2px;
+
+	&.active {
+		margin-block: 0;
+		border: 2px dashed var(--border);
+	}
 }

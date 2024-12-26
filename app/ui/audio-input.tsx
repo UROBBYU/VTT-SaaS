@@ -1,31 +1,51 @@
 'use client'
 
+import { ALLOWED_AUDIO_EXTENSIONS, parseAudioFile } from '@util'
 import { State, uploadAudio } from '@lib/actions'
 import clsx from 'clsx'
-import { ChangeEventHandler, DragEventHandler, useActionState, useEffect, useRef, useState } from 'react'
+import { ChangeEventHandler, DragEventHandler, useActionState, useRef, useState } from 'react'
 
-export default () => {
+export default (props: {
+	text?: string
+	filename?: string
+}) => {
 	const [file, setFile] = useState<File>()
 	const [fileEnter, setFileEnter] = useState(false)
 	const [forcedButton, setForcedButton] = useState(false)
 
 	const fileRef = useRef<HTMLInputElement>(null)
 
-	const initialState: State = {}
-	const [state, formAction] = useActionState(uploadAudio, initialState)
+	const checkAudio = (prevState: State | undefined, formData: FormData) => {
+		const validatedFile = parseAudioFile(formData.get('file'))
 
-	const handleForm = (payload: FormData) => {
+		if (!validatedFile.success) return {
+			errors: validatedFile.error.flatten().formErrors,
+			message: 'Upload Failed.'
+		}
+
 		setForcedButton(false)
-		formAction(payload)
+
+		return uploadAudio(prevState, formData)
 	}
+
+	const initialState: State = {}
+	const [state, formAction] = useActionState(checkAudio, initialState)
 
 	const handleDragOver: DragEventHandler<HTMLFormElement> = e => {
 		const item = e.dataTransfer.items[0]
-		const isAudio = e.dataTransfer.items.length === 1 &&
-			item.kind === 'file' &&
-			item.type === 'audio/mpeg'
+		const isAllowed = e.dataTransfer.items.length === 1 &&
+			item.kind === 'file' && [
+				'audio/mpeg',
+				'audio/mp4',
+				'audio/wav',
+				'audio/vnd.wav',
+				'audio/webm',
+				'video/mpeg',
+				'video/mp4',
+				'video/webm'
+			].includes(item.type)
 
-		if (!isAudio) {
+		if (!isAllowed) {
 			e.dataTransfer.effectAllowed = 'none'
 			return
 		}
@@ -48,7 +68,7 @@ export default () => {
 		const fileExtension = file.name.split('.').pop() ?? ''
 		console.log('File:', file)
 
-		if (!['mp3'].includes(fileExtension))
+		if (!ALLOWED_AUDIO_EXTENSIONS.includes(fileExtension))
 			return console.error('Unsupported file extension:', fileExtension)
 
 		setFile(file)
@@ -69,52 +89,67 @@ export default () => {
 	}
 
 	return <form
-		action={handleForm}
-		className={clsx(
-			"flex flex-col w-full border-y border-gray-300 rounded-md",
-			fileEnter && "bg-blue-300 border-blue-400"
-		)}
+		className="w-full h-screen"
+		action={formAction}
 		onDragOver={handleDragOver}
 		onDragLeave={handleDragLeave}
 		onDragEnd={handleDragEnd}
 		onDrop={handleDrop}
 	>
-		<div className={clsx(
-			'p-2 border-b',
-			!state.message && 'hidden',
-			state.errors && 'text-red-500'
-		)}>
-			{state.message}
+		<div className='form-column flex flex-col justify-end w-full h-full tracking-wide'>
 			<div className={clsx(
-				!state.errors && 'hidden'
+				'pb-10 pl-5 leading-relaxed',
+				!(state.message ?? props.text) && 'hidden',
+				state.errors && 'text-red-500'
 			)}>
-				{state.errors?.map((error: string) =>
-					<p className="mt-2 text-sm text-red-500" key={error}>
-						{error}
-					</p>)
-				}
+				{state.message ?? props.text}
+				<div className={clsx(
+					!state.errors && 'hidden'
+				)}>
+					{state.errors?.map((error: string) =>
+						<p className="mt-2 text-sm text-red-500" key={error}>
+							{error}
+						</p>)
+					}
+				</div>
+			</div>
+			<div className={clsx(
+				'input-box rounded-2xl',
+				fileEnter && 'active'
+			)}>
+				<label htmlFor="file" className="block p-4 justify-center text-center cursor-pointer">
+					{file
+						? <p className='text-lg'>Selected file: {file.name}</p>
+						: <>
+							<p className='text-lg'>{props.filename
+								? `Response for: ${props.filename}`
+								: 'Choose a file to upload'
+							}</p>
+							<p className='text-sm text-gray-300'>
+								(Suppoted file types are: <code>mp3</code>, <code>mp4</code>, <code>mpeg</code>, <code>mpga</code>, <code>m4a</code>, <code>wav</code>, <code>webm</code>)
+							</p>
+						</>
+					}
+				</label>
+				<input
+					id="file"
+					name="file"
+					ref={fileRef}
+					type="file"
+					accept=".mp3"
+					required
+					className="hidden"
+					onChange={handleChange}
+				/>
+				<button
+					className={clsx(
+						'w-full justify-center p-2 border-t-4 border-dark text-lg',
+						((!file || state.message) && !forcedButton) && 'hidden'
+					)}
+				>
+					Upload
+				</button>
 			</div>
 		</div>
-		<button
-			className={clsx(
-				'justify-center p-2 border-b',
-				((!file || state.message) && !forcedButton) && 'hidden'
-			)}
-		>
-			Upload
-		</button>
-		<label htmlFor="file" className="block p-4 justify-center text-center cursor-pointer">
-			{file ? `Selected file: ${file.name}` : 'Choose a file to upload'}
-		</label>
-		<input
-			id="file"
-			name="file"
-			ref={fileRef}
-			type="file"
-			accept=".mp3"
-			required
-			className="hidden"
-			onChange={handleChange}
-		/>
 	</form>
 }

@@ -1,9 +1,8 @@
 'use server'
 
-import { z } from 'zod'
 import OpenAI from 'openai'
-import { getDataSizeUnit } from '@util'
 import prisma from '@lib/prisma'
+import { parseAudioFile } from '@util'
 import { currentUser } from '@clerk/nextjs/server'
 import crypto from 'crypto'
 
@@ -12,25 +11,7 @@ export type State = {
 	message?: string
 }
 
-const ALLOWED_AUDIO_SIZE = 1e6
-const audioSizeUnit = getDataSizeUnit(ALLOWED_AUDIO_SIZE)
-const ALLOWED_AUDIO_SIZE_TEXT =
-	`${Math.round(ALLOWED_AUDIO_SIZE / 1e3 ** audioSizeUnit[1] * 1e2) / 1e2} ${audioSizeUnit[0]}`
-
-const ALLOWED_AUDIO_EXTENSIONS = [
-	'mp3'
-]
-
 const openai = new OpenAI()
-
-const checkFileSize = (file: File) => file.size <= ALLOWED_AUDIO_SIZE
-
-const checkFileType = (file: File) =>
-	ALLOWED_AUDIO_EXTENSIONS.includes(file.name.split('.').pop()?.toLowerCase() ?? '')
-
-const AudioFileScheme = z.instanceof(File)
-	.refine(checkFileSize, `File size exceeds ${ALLOWED_AUDIO_SIZE_TEXT}.`)
-	.refine(checkFileType, 'Incorrect file type.')
 
 export const uploadAudio = async (prevState: State | undefined, formData: FormData): Promise<State> => {
 	const user = await currentUser()
@@ -40,7 +21,7 @@ export const uploadAudio = async (prevState: State | undefined, formData: FormDa
 		message: 'Internal Server Error.'
 	}
 
-	const validatedFile = AudioFileScheme.safeParse(formData.get('file'))
+	const validatedFile = parseAudioFile(formData.get('file'))
 
 	if (!validatedFile.success) return {
 		errors: validatedFile.error.flatten().formErrors,
