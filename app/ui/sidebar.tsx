@@ -1,7 +1,7 @@
 import SidebarItem from '@ui/sidebar-item'
 import type { Upload } from '@prisma/client'
 
-export default async ({
+export default ({
 	uploads = []
 }: {
 	uploads?: Upload[]

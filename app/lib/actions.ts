@@ -13,7 +13,7 @@ export type State = {
 
 const openai = new OpenAI()
 
-export const uploadAudio = async (prevState: State | undefined, formData: FormData): Promise<State> => {
+export const uploadAudio = async (formData: FormData): Promise<State> => {
 	const user = await currentUser()
 
 	if (!user) return {
@@ -21,7 +21,7 @@ export const uploadAudio = async (prevState: State | undefined, formData: FormDa
 		message: 'Internal Server Error.'
 	}
 
-	const validatedFile = parseAudioFile(formData.get('file'))
+	const validatedFile = await parseAudioFile(formData.get('file'))
 
 	if (!validatedFile.success) return {
 		errors: validatedFile.error.flatten().formErrors,

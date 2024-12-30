@@ -11,9 +11,9 @@ export default ({
 }) =>
 <Link
 	href={`/?id=${id}`}
-	className="block mb-4 mr-2 p-2 rounded-e-xl select-none cursor-pointer bg-light"
+	className='block mt-4 mr-2 p-2 rounded-e-xl select-none cursor-pointer bg-light hover:opacity-80 active:opacity-60'
 
 >
-	<p className="text-sm text-gray-300">{date.toDateString()} at {date.getHours()}:{date.getMinutes()}:{date.getSeconds()}</p>
-	<p>{filename}</p>
+	<p className='text-sm opacity-60'>{date.toDateString()} at {date.toTimeString().substring(0, 8)}</p>
+	<p className='font-mono tracking-tight'>{filename}</p>
 </Link>

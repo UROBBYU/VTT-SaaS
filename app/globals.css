@@ -6,7 +6,7 @@
 	--background: #212121;
 	--background-dark: #171717;
 	--background-light: #2f2f2f;
-	--foreground: #ececec;
+	--foreground: #c27568;
 	--border: #999;
 }
 
@@ -27,6 +27,18 @@ code {
 
 .w-100 {
 	width: 25rem;
+}
+
+.h-screen-44 {
+	height: calc(100vh - 44px);
+}
+
+.lh-28 {
+	line-height: 28px;
+}
+
+.gc-3 {
+	grid-template-columns: repeat(3, minmax(max-content, 1fr));
 }
 
 .bg-dark {
@@ -55,6 +67,6 @@ code {
 
 	&.active {
 		margin-block: 0;
-		border: 2px dashed var(--border);
+		border: 2px dashed var(--foreground);
 	}
 }

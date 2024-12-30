@@ -1,16 +1,17 @@
-import prisma from '@lib/prisma'
-import { currentUser } from '@clerk/nextjs/server'
-import AudioInput from '@ui/audio-input'
-import Sidebar from '@ui/sidebar'
 import {
 	SignedOut,
 	SignInButton,
-	SignedIn,
-	UserButton
+	SignedIn
 } from '@clerk/nextjs'
-import { dark } from '@clerk/themes'
+import Uploads from '@ui/uploads'
+import prisma from '@lib/prisma'
+import { currentUser } from '@clerk/nextjs/server'
 
-export default async (props: { searchParams?: Promise<{ id?: string }> }) => {
+export default async ({
+	searchParams
+}: {
+	searchParams?: Promise<{ id?: string }>
+}) => {
 	const user = await currentUser()
 
 	if (!user) throw new Error('Not Authorized.')
@@ -32,41 +33,24 @@ export default async (props: { searchParams?: Promise<{ id?: string }> }) => {
 	}
 
 	const userDB = await checkDB(performance.now())
-	performance.now()
 
 	if (!userDB) throw new Error(`No DB entry found for (${user.id}).`)
 
-	const uploads = userDB.uploads
-	let selectedUpload: {
-		filename: string
-		text: string
-	} | undefined
-
-	const searchParams = await props.searchParams
-	const upId = searchParams?.id
-	if (upId) selectedUpload = uploads.find(up => up.id === upId)
+	const upId = (await searchParams)?.id
 
 	return <main>
 		<SignedOut>
-			<div className="flex flex-col justify-center w-screen h-screen">
-				<div className="flex justify-center text-xl">
+			<div className='flex flex-col justify-center w-screen h-screen'>
+				<div className='flex justify-center text-xl'>
 					<SignInButton/>
 				</div>
 			</div>
 		</SignedOut>
 		<SignedIn>
-			<div className="flex">
-				<div className="w-100 bg-dark">
-					<div className="flex justify-end p-2 w-full">
-						<UserButton showName appearance={{ baseTheme: dark }}/>
-					</div>
-					<Sidebar uploads={uploads}/>
-				</div>
-				<AudioInput
-					filename={selectedUpload?.filename}
-					text={selectedUpload?.text}
-				/>
-			</div>
+			<Uploads
+				upId={upId}
+				uploads={userDB.uploads}
+			/>
 		</SignedIn>
 	</main>
 }

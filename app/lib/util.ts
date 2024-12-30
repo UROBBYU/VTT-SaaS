@@ -8,7 +8,7 @@ export const getDataSizeUnit = (v: number,
 
 export const roundTo = (n: number, p: number, _n = 10 ** p) => Math.round(n * _n) / _n
 
-const ALLOWED_AUDIO_SIZE = process.env.ALLOWED_AUDIO_SIZE ?? 1e6
+const ALLOWED_AUDIO_SIZE = 25e6
 const audioSizeUnit = getDataSizeUnit(ALLOWED_AUDIO_SIZE)
 const ALLOWED_AUDIO_SIZE_TEXT =
 	`${Math.round(ALLOWED_AUDIO_SIZE / 1e3 ** audioSizeUnit[1] * 1e2) / 1e2} ${audioSizeUnit[0]}`
@@ -32,4 +32,4 @@ const AudioFileScheme = z.instanceof(File)
 	.refine(checkFileSize, `File size exceeds ${ALLOWED_AUDIO_SIZE_TEXT}.`)
 	.refine(checkFileType, 'Incorrect file type.')
 
-export const parseAudioFile = AudioFileScheme.safeParse
+export const parseAudioFile = AudioFileScheme.safeParseAsync

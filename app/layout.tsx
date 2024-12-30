@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-	title: "UROBBYU's VTT SaaS App",
+	title: 'UROBBYU\'s VTT SaaS App',
 	description: 'Simple Voice-to-text app created with Next.js'
 }
 
@@ -24,7 +24,7 @@ export default ({
 	children: React.ReactNode
 }>) =>
 <ClerkProvider>
-	<html lang="en">
+	<html lang='en'>
 		<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 			{children}
 		</body>
